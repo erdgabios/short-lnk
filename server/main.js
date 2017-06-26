@@ -1,8 +1,26 @@
 import { Meteor } from 'meteor/meteor';
 import SimpleSchema from 'simpl-schema';
+import { Accounts } from 'meteor/accounts-base';
 
 Meteor.startup(() => {
   // code to run on server at startup
+
+  Accounts.validateNewUser((user) => {
+    const email = user.emails[0].address;
+
+    try {
+      new SimpleSchema({
+        email: {
+          type: String,
+          regEx: SimpleSchema.RegEx.Email
+        }
+      }).validate({ email });
+    } catch (e) {
+      throw new Meteor.Error(400, e.message);
+    }
+
+    return true;
+  });
 
   // const petSchema = new SimpleSchema({
   //   name: {
@@ -23,9 +41,8 @@ Meteor.startup(() => {
   // });
   //
   // petSchema.validate({
-  //
   //   age: 21,
-  //   contactNumber: 'as1234'
+  //   contactNumber: 'ab234#'
   // });
 
   // const employeeSchema = new SimpleSchema({
@@ -42,7 +59,12 @@ Meteor.startup(() => {
   //     type: String,
   //     regEx: SimpleSchema.RegEx.Email
   //   }
+  // });
   //
+  // employeeSchema.validate({
+  //   name: 'Mike',
+  //   hourlyWage: 0,
+  //   email: 'mike@example.com'
   // });
 
 });
